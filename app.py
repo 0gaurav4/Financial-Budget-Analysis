@@ -13,7 +13,7 @@ with open('style.css') as css:
 
 @st.cache_data
 def load_data():
-    return pd.read_csv("Indian Union Budget FY 21-22 till 23-24.csv")
+    return pd.read_csv("updated.csv")
 
 # UI integration
 
@@ -64,7 +64,6 @@ elif choice == "Visualize Data":
     cat_cols.remove("Ministry/Department")
     # num_cols.remove("Scheme")
     num_cols.remove("Actuals 2021-2022 Total")
-    cat_cols.append("Actuals 2021-2022 Total")
     # cat_cols.append("Scheme")
 
     snum_cols = st.sidebar.selectbox("Select a numeric column", num_cols)
@@ -74,10 +73,10 @@ elif choice == "Visualize Data":
 
     # visualization
 
-    fig1 = px.histogram(df.head(40),x=snum_cols,
+    fig1 = px.histogram(df,x=snum_cols,
                         title=f"Distribution of {snum_cols}")
 
-    fig2 = px.pie(df.head(30),names=scat_cols,title=f"Distribution of {scat_cols}",hole=0.3)
+    fig2 = px.pie(df,names=scat_cols,title=f"Distribution of {scat_cols}",hole=0.3)
 
     c1.plotly_chart(fig1)
     c2.plotly_chart(fig2)
@@ -86,7 +85,7 @@ elif choice == "Visualize Data":
     st.plotly_chart(fig3)
 
     fig4 = px.treemap(
-        df.head(40),path=["Ministry/Department","Actuals 2021-2022 Total"],
+        df,path=["Ministry/Department","Actuals 2021-2022 Total"],
         title="financial type Distribution"
     )
 
@@ -100,16 +99,16 @@ elif choice == "Column Analysis":
         vc = df[scol].value_counts()
         most_common = vc.idxmax()
         c1, c2 = st.columns([3,1])
-        fig5 = px.histogram(df.head(40),x=scol,title=f"Distribution of {scol}")
+        fig5 = px.histogram(df,x=scol,title=f"Distribution of {scol}")
         c1.plotly_chart(fig5)
         c2.subheader("Total Data")
         c2.dataframe(vc,use_container_width=True)
         c2.metric("Most Common", most_common, int(vc[most_common]))
 
         c1, c2 = st.columns(2)
-        fig2 = px.pie(df.head(30),names=scol,title=f"Percentage wise of{scol}",hole=.3)
+        fig2 = px.pie(df,names=scol,title=f"Percentage wise of{scol}",hole=.3)
         c1.plotly_chart(fig2)
-        fig3 = px.box(df.head(30), x=scol,title=f"{scol} by {scol}")
+        fig3 = px.box(df, x=scol,title=f"{scol} by {scol}")
         c2.plotly_chart(fig3)
         fig = px.funnel_area(names=vc.index, values=vc.values,title=f"{scol} Funnel Area", height=600)
         st.plotly_chart(fig, use_container_width=True)
@@ -117,9 +116,9 @@ elif choice == "Column Analysis":
     else:
         tab1 , tab2 = st.tabs([" Revised Estimates2022-2023 Total","Budget Estimates2023-2024 Total"])
         with tab1:
-            score = df.head(10)[scol].describe() 
-            fig1 = px.histogram(df.head(10), x=scol, title=f"Distribution of {scol}")
-            fig2 = px.box(df.head(10), x=scol, title=f"{scol} by {scol}")
+            score = df[scol].describe() 
+            fig1 = px.histogram(df, x=scol, title=f"Distribution of {scol}")
+            fig2 = px.box(df, x=scol, title=f"{scol} by {scol}")
             c1,c2,c3 = st.columns([2,3,3])
             c1.dataframe(score)
             c2.plotly_chart(fig1)
